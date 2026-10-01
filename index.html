@@ -1,0 +1,829 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Makieta nowej strony Warszawskiej Ligi Biegowej.">
+<link rel="icon" href="logo-wlb.png">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Nowa strona WLB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800;900&family=Source+Sans+3:wght@400;600;700&display=swap">
+<style>
+/* Layout: strona jak okrążenie stadionu – tartan na starcie, tablica pomiaru czasu, oś sezonu na bieżni, murawa z dystansami, ciemna tablica wyników, banda LED z partnerami. */
+:root {
+  /* stałe kolory obiektu – te same w obu motywach */
+  --tartan: #c63f26;
+  --tartan-deep: #8f2a16;
+  --signal: #ffd23f;
+  --signal-ink: #241c00;
+  --night: #0b0e14;
+  --night-2: #161b26;
+  --grass-a: #2e7a44;
+  --grass-b: #33864b;
+  --infield: #3f9556;
+  --stadion: #4cc27a;
+  --hala: #8fa6ff;
+  /* kolory z logo (graffiti „WarszAWFska”) */
+  --wlb-red: #e63b2e;
+  --wlb-orange: #f39200;
+  --wlb-green: #5fb53b;
+  /* sekcje „papierowe” – zależne od motywu */
+  --bg: #f1f3f6;
+  --fg: #121826;
+  --muted: #586174;
+  --line: #d9dee7;
+  --tartan-ink: #b5361f;
+  --card: #ffffff;
+  --field: #f6f7fa;
+  --f-display: "Big Shoulders Display", "Barlow Condensed", "Arial Narrow", sans-serif;
+  --f-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f131b; --fg: #e9edf4; --muted: #9ba5b8; --line: #263043; --tartan-ink: #ff7a5c; --card: #161c28; --field: #0f141d; color-scheme: dark } }
+:root[data-theme="dark"] { --bg: #0f131b; --fg: #e9edf4; --muted: #9ba5b8; --line: #263043; --tartan-ink: #ff7a5c; --card: #161c28; --field: #0f141d; color-scheme: dark }
+
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--fg); font: 400 17px/1.55 var(--f-body); overflow-x: hidden }
+a { color: inherit }
+:focus-visible { outline: 3px solid var(--signal); outline-offset: 3px; border-radius: 4px }
+.wrap { max-width: 1200px; margin: 0 auto; padding-inline: 16px }
+h1, h2, h3 { font-family: var(--f-display); margin: 0; text-wrap: balance; text-transform: uppercase; letter-spacing: .01em }
+h2 { font-size: clamp(42px, 6.4vw, 78px); font-weight: 900; line-height: .9 }
+h3 { font-size: 26px; font-weight: 800; line-height: 1 }
+p { margin: 0 }
+.kicker { font: 700 13px/1.2 var(--f-body); letter-spacing: .18em; text-transform: uppercase; color: var(--tartan-ink); display: flex; align-items: center; gap: 12px }
+/* trzy pociągnięcia sprayem w kolorach logo */
+.kicker::before { content: ""; width: 42px; height: 9px; flex: none; transform: skewX(-24deg);
+  background: linear-gradient(90deg, var(--wlb-red) 0 30%, transparent 30% 35%, var(--wlb-orange) 35% 65%, transparent 65% 70%, var(--wlb-green) 70%) }
+.num { font-variant-numeric: tabular-nums }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; font: 800 20px/1 var(--f-display); letter-spacing: .04em; text-transform: uppercase;
+  text-decoration: none; background: var(--signal); color: var(--signal-ink); padding: 15px 22px; border-radius: 8px; border: 0; cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease }
+.btn:hover { transform: translateY(-2px); box-shadow: 0 10px 22px -10px rgba(0,0,0,.5) }
+.btn .arr { font-size: 1.1em; transition: transform .15s ease }
+.btn:hover .arr { transform: translateX(4px) }
+.btn.line { background: transparent; color: #fff; box-shadow: inset 0 0 0 2px rgba(255,255,255,.75) }
+
+.mock-note { background: var(--night); color: rgba(255,255,255,.7); font: 600 12px/1.3 var(--f-body); letter-spacing: .06em; text-transform: uppercase }
+.mock-note .wrap { padding-block: 6px }
+
+/* ---------- HERO: tartan i tory w perspektywie ---------- */
+.hero { position: relative; overflow: hidden; isolation: isolate; color: #fff;
+  background:
+    radial-gradient(circle at 1px 1px, rgba(0,0,0,.09) 1px, transparent 1.4px) 0 0 / 5px 5px,
+    linear-gradient(180deg, var(--tartan-deep) 0%, var(--tartan) 62%) }
+.plane { position: absolute; inset: 30% -40% -2% -40%; z-index: -1; transform: perspective(560px) rotateX(60deg); transform-origin: 50% 100%;
+  background: repeating-linear-gradient(90deg, rgba(255,255,255,.85) 0 4px, transparent 4px 12.5%);
+  -webkit-mask-image: linear-gradient(to top, #000 35%, transparent 92%); mask-image: linear-gradient(to top, #000 35%, transparent 92%);
+  animation: rush 1.3s cubic-bezier(.2,.7,.2,1) both }
+.plane::after { content: ""; position: absolute; left: 0; right: 0; bottom: 30%; height: 10px; background: rgba(255,255,255,.9) }
+.plane .lanes { position: absolute; left: 0; right: 0; bottom: 6%; display: grid; grid-template-columns: repeat(8, 1fr);
+  font: 900 clamp(70px, 12vw, 180px)/1 var(--f-display); color: rgba(255,255,255,.88); text-align: center }
+@keyframes rush { from { transform: perspective(560px) rotateX(60deg) translateY(28%); opacity: .2 } }
+
+.top { display: flex; align-items: center; gap: 22px; padding-block: 14px }
+.brand { display: flex; align-items: center; gap: 12px; text-decoration: none; flex: none }
+.brand img { width: 60px; height: 46px; border-radius: 8px; background: #000; display: block; object-fit: contain; box-shadow: 0 0 0 2px rgba(255,255,255,.25) }
+.brand span { font: 800 20px/.95 var(--f-display); text-transform: uppercase; letter-spacing: .03em; max-width: 8.5em }
+.top nav { display: flex; gap: 2px; margin-left: auto; min-width: 0; overflow-x: auto; scrollbar-width: none }
+.top nav a { font-weight: 600; text-decoration: none; padding: 8px 11px; border-radius: 6px; white-space: nowrap; color: #fff }
+.top nav a:hover { background: rgba(0,0,0,.18) }
+.top .btn { font-size: 17px; padding: 11px 16px }
+@media (max-width: 880px) { .top { flex-wrap: wrap; gap: 8px 12px } .top .btn { margin-left: auto } .top nav { order: 3; flex-basis: 100%; margin-left: -10px } }
+
+.hero-in { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 36px; align-items: center; padding-block: 18px 26px }
+@media (max-width: 940px) { .hero-in { grid-template-columns: 1fr; gap: 24px; padding-block: 12px 22px } }
+
+/* zdjęcie z zawodów w skośnej ramie */
+.shot-wrap { position: relative; align-self: stretch; min-height: 400px }
+.shot { position: absolute; inset: 0; margin: 0; clip-path: polygon(12% 0, 100% 0, 100% 100%, 0 100%); background: var(--tartan-deep) }
+.shot img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 45%; display: block; max-width: 100% }
+.shot::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 55%, rgba(80,20,10,.55)) }
+.shot figcaption { position: absolute; right: 16px; bottom: 14px; z-index: 1; font: 700 12px/1 var(--f-body); letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.85) }
+.speed { position: absolute; left: -26px; bottom: 34px; display: grid; gap: 7px; z-index: 1 }
+.speed i { display: block; height: 12px; transform: skewX(-24deg) }
+.speed i:nth-child(1) { width: 120px; background: var(--wlb-red); box-shadow: 0 0 0 2px rgba(0,0,0,.15) }
+.speed i:nth-child(2) { width: 90px; background: var(--wlb-orange); margin-left: 14px }
+.speed i:nth-child(3) { width: 60px; background: var(--wlb-green); margin-left: 28px }
+@media (max-width: 940px) {
+  .shot-wrap { min-height: 0; aspect-ratio: 3 / 2; max-width: none; margin-inline: -16px }
+  .shot { clip-path: polygon(0 0, 100% 0, 100% 86%, 0 100%) }
+  .speed { left: 12px; bottom: auto; top: -14px }
+  .shot figcaption { bottom: 26px }
+}
+.hero h1 { font-weight: 900; font-size: clamp(56px, 8.4vw, 116px); line-height: .84; letter-spacing: -.005em }
+.hero h1 .w { display: block; animation: go .6s cubic-bezier(.2,.8,.2,1) both }
+.hero h1 .w2 { animation-delay: .25s }
+.hero h1 .w3 { animation-delay: .55s; color: var(--signal); font-style: italic }
+@keyframes go { from { transform: translateX(-60px); opacity: 0 } }
+.hero .sub { margin-top: 18px; font-size: clamp(18px, 2vw, 21px); max-width: 32em; color: rgba(255,255,255,.92) }
+.hero .sub b { font-weight: 700; color: #fff }
+.hero .acts { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px }
+
+/* tablica pomiaru czasu – zwarty pasek na dole pierwszego ekranu */
+.board { position: relative; margin-bottom: 28px; background: var(--night); color: #fff; border-radius: 14px; padding: 16px 22px; display: grid; gap: 12px 30px;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, .85fr); align-items: center;
+  box-shadow: 0 24px 50px -28px rgba(0,0,0,.8), inset 0 0 0 1px rgba(255,255,255,.07) }
+.board-col { display: grid; gap: 8px; min-width: 0 }
+@media (max-width: 940px) { .board { grid-template-columns: 1fr; gap: 16px; margin-bottom: 22px } }
+.board-top { display: flex; justify-content: space-between; align-items: center; gap: 12px }
+.board-top b { font: 900 38px/.9 var(--f-display); text-transform: uppercase }
+.chip { display: inline-flex; align-items: center; gap: 7px; font: 700 12px/1 var(--f-body); letter-spacing: .12em; text-transform: uppercase;
+  padding: 7px 10px; border-radius: 999px; background: var(--night-2) }
+.chip::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor }
+.chip.Stadion { color: var(--stadion) } .chip.Hala { color: var(--hala) }
+.board .when { color: rgba(255,255,255,.75); font-size: 16px }
+.board .lbl { font: 700 12px/1 var(--f-body); letter-spacing: .2em; text-transform: uppercase; color: var(--signal) }
+.digits { display: grid; grid-template-columns: repeat(4, auto); justify-content: start; gap: 10px }
+.dgroup { display: grid; gap: 5px }
+.dpair { display: grid; grid-template-columns: 34px 34px; gap: 3px }
+.dg { position: relative; height: 48px; display: grid; place-items: center; background: var(--night-2); border-radius: 6px;
+  font: 800 32px/1 var(--f-display); color: var(--signal); overflow: hidden }
+@media (max-width: 940px) {
+  .digits { grid-template-columns: repeat(4, minmax(0, 1fr)) }
+  .dpair { grid-template-columns: 1fr 1fr }
+  .dg { height: auto; aspect-ratio: 3 / 4; font-size: clamp(28px, 8vw, 40px) }
+}
+.dg::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 2px; background: rgba(0,0,0,.55) }
+.dgroup > span { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.55); text-align: center }
+.board .facts { display: grid; gap: 2px; font-size: 14px; color: rgba(255,255,255,.75) }
+.board .facts b { color: #fff }
+.board .btn { width: 100% }
+
+/* ---------- SEZON: oś na bieżni ---------- */
+.sec { padding-block: 84px }
+.sec-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 16px 30px; margin-bottom: 44px }
+.sec-head > div { display: grid; gap: 12px; max-width: 46em }
+.sec-head p.lead { font-size: 19px; color: var(--muted) }
+.tl { position: relative; height: 290px }
+.tl-track { position: absolute; left: 0; right: 0; top: 112px; height: 66px; border-radius: 8px; overflow: hidden;
+  background: repeating-linear-gradient(180deg, transparent 0 15.5px, rgba(255,255,255,.65) 15.5px 16.5px), var(--tartan) }
+.tl-month { position: absolute; bottom: 4px; transform: translateX(6px); font: 700 11px/1 var(--f-body); letter-spacing: .14em; color: rgba(255,255,255,.6) }
+.tl-month::before { content: ""; position: absolute; left: -6px; bottom: -4px; height: 66px; width: 1px; background: rgba(255,255,255,.18) }
+.tl-break { position: absolute; top: 0; bottom: 0; display: grid; place-items: center;
+  background: repeating-linear-gradient(45deg, rgba(0,0,0,.22) 0 7px, transparent 7px 14px);
+  font: 800 15px/1 var(--f-display); letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.9) }
+.tl-run { position: absolute; left: 0; top: 23px; height: 5px; background: var(--signal); border-radius: 0 3px 3px 0 }
+.tl-run::after { content: ""; position: absolute; right: -8px; top: -6px; width: 17px; height: 17px; border-radius: 50%;
+  background: var(--signal); box-shadow: 0 0 0 3px var(--night); animation: pulse 1.8s ease-out infinite }
+@keyframes pulse { 0% { box-shadow: 0 0 0 3px var(--night), 0 0 0 3px rgba(255,210,63,.6) } 100% { box-shadow: 0 0 0 3px var(--night), 0 0 0 16px rgba(255,210,63,0) } }
+.tl-mark { position: absolute; top: 112px; height: 66px; width: 4px; margin-left: -2px; background: #fff }
+.tl-mark.past { background: rgba(255,255,255,.55) }
+.tl-lab { position: absolute; width: 96px; margin-left: -48px; text-align: center; display: grid; gap: 3px; justify-items: center }
+.tl-lab.up { bottom: calc(290px - 112px + 12px) }
+.tl-lab.down { top: calc(112px + 66px + 12px) }
+.tl-lab::after { content: ""; position: absolute; left: 50%; width: 1px; height: 12px; background: var(--line) }
+.tl-lab.up::after { bottom: -12px } .tl-lab.down::after { top: -12px }
+.tl-lab .r { font: 700 11px/1 var(--f-body); letter-spacing: .14em; text-transform: uppercase; color: var(--muted) }
+.tl-lab .d { font: 900 34px/.95 var(--f-display) }
+.tl-lab .v { font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; color: var(--muted) }
+.tl-lab .v::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--dot) }
+.tl-lab a { font-size: 13px; font-weight: 700; color: var(--tartan-ink) }
+.tl-lab.past .d { color: var(--muted) }
+.tl-lab.next .d { background: var(--signal); color: var(--signal-ink); padding: 2px 8px 0; border-radius: 4px }
+.tl-lab.next .r { color: var(--tartan-ink) }
+.tl-legend { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 18px; font-size: 15px; color: var(--muted) }
+.tl-legend span { display: inline-flex; align-items: center; gap: 8px }
+.tl-legend i { width: 10px; height: 10px; border-radius: 50%; display: inline-block }
+.tl-legend i.run { width: 24px; height: 5px; border-radius: 3px; background: var(--signal) }
+.tl-list { display: none; list-style: none; margin: 0; padding: 0 }
+@media (max-width: 760px) {
+  .tl { display: none }
+  .tl-list { display: grid }
+  .tl-list li { display: grid; grid-template-columns: 22px 92px minmax(0, 1fr); gap: 0 14px; align-items: center; min-height: 66px }
+  .tl-list .ln { align-self: stretch; background: repeating-linear-gradient(90deg, transparent 0 10px, rgba(255,255,255,.6) 10px 11px), var(--tartan) }
+  .tl-list li.past .ln { opacity: .55 }
+  .tl-list li.next .ln { background: var(--signal) }
+  .tl-list .d { font: 900 30px/1 var(--f-display) }
+  .tl-list li.past .d { color: var(--muted) }
+  .tl-list .info { display: grid; gap: 2px; font-size: 15px; color: var(--muted); padding-block: 10px; border-bottom: 1px solid var(--line) }
+  .tl-list .info b { color: var(--fg); font-weight: 700 }
+  .tl-list li.next .info b { color: var(--tartan-ink) }
+  .tl-list .info a { color: var(--tartan-ink); font-weight: 700 }
+}
+
+/* ---------- MURAWA: dystanse ---------- */
+.grass { color: #fff; background: repeating-linear-gradient(90deg, var(--grass-a) 0 90px, var(--grass-b) 90px 180px); position: relative }
+.grass::before, .grass::after { content: ""; position: absolute; left: 0; right: 0; height: 14px;
+  background: repeating-linear-gradient(90deg, transparent 0 58px, rgba(255,255,255,.75) 58px 60px), var(--tartan) }
+.grass::before { top: 0 } .grass::after { bottom: 0 }
+.grass .kicker { color: var(--signal) }
+.dist { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.3fr); gap: 46px; align-items: center }
+@media (max-width: 940px) { .dist { grid-template-columns: 1fr; gap: 30px } }
+.pick { display: grid; gap: 22px }
+.pick-row { display: grid; gap: 10px }
+.pick-row > span { font: 700 12px/1 var(--f-body); letter-spacing: .18em; text-transform: uppercase; color: rgba(255,255,255,.75) }
+.chips { display: flex; flex-wrap: wrap; gap: 6px }
+.chips button { font: 800 20px/1 var(--f-display); font-variant-numeric: tabular-nums; color: #fff; background: rgba(0,0,0,.14);
+  border: 2px solid rgba(255,255,255,.55); border-radius: 999px; padding: 9px 14px; cursor: pointer; transition: background .15s }
+.chips button:hover:not(:disabled) { background: rgba(0,0,0,.28) }
+.chips button[aria-pressed="true"] { background: #fff; color: var(--grass-a); border-color: #fff }
+.chips button:disabled { opacity: .35; cursor: not-allowed; text-decoration: line-through }
+.chips.big button { font-size: 28px; padding: 10px 22px }
+.age { display: flex; align-items: end; gap: 16px }
+.age b { font: 900 clamp(96px, 13vw, 150px)/.78 var(--f-display); color: var(--signal) }
+.age p { font-size: 18px; line-height: 1.35; padding-bottom: 4px }
+.age p strong { display: block; font: 800 30px/1 var(--f-display); text-transform: uppercase; margin-bottom: 4px }
+.oval { margin: 0; display: grid; gap: 10px }
+.oval svg { width: 100%; height: auto; display: block; filter: drop-shadow(0 30px 30px rgba(0,0,0,.25)) }
+.oval figcaption { display: flex; align-items: center; gap: 10px; font-size: 17px; font-weight: 600 }
+.oval figcaption i { width: 28px; height: 6px; border-radius: 3px; background: var(--signal); flex: none }
+.svg-label { font: 800 7px var(--f-display); letter-spacing: .08em; fill: #fff }
+.svg-sub { font: 700 4.4px var(--f-body); letter-spacing: .1em; fill: rgba(255,255,255,.85) }
+
+/* ---------- DZIEŃ ZAWODÓW ---------- */
+.day { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 56px; align-items: center }
+@media (max-width: 940px) { .day { grid-template-columns: 1fr; gap: 36px } }
+.day-shot { margin: 0; position: relative; aspect-ratio: 1; max-width: 100% }
+.day-shot img { width: 100%; height: 100%; object-fit: cover; object-position: 48% 50%; display: block; max-width: 100%;
+  clip-path: polygon(0 0, 100% 0, 90% 100%, 0 100%) }
+.day-shot figcaption { position: absolute; left: 0; bottom: 18px; background: var(--night); color: #fff; padding: 9px 14px;
+  font: 800 18px/1 var(--f-display); letter-spacing: .06em; text-transform: uppercase }
+.day-shot figcaption::before { content: ""; display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--hala); margin-right: 9px; vertical-align: 1px }
+@media (max-width: 940px) { .day-shot { aspect-ratio: 3 / 2; max-width: none; margin-inline: -16px } .day-shot img { clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%) } }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 26px }
+.steps li { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 4px 18px; align-items: start }
+.steps .n { grid-row: span 2; font: 900 120px/.74 var(--f-display); color: transparent; -webkit-text-stroke: 2.5px var(--c); text-align: center }
+.steps li:nth-child(1) { --c: var(--wlb-red) } .steps li:nth-child(2) { --c: var(--wlb-orange) }
+.steps li:nth-child(3) { --c: var(--wlb-green) } .steps li:nth-child(4) { --c: var(--tartan-ink) }
+.steps h3 { font-size: 30px; padding-top: 4px }
+.steps p { color: var(--muted); font-size: 17px }
+.steps p b { color: var(--fg); font-weight: 700 }
+
+/* ---------- TABLICA WYNIKÓW ---------- */
+.night { background: var(--night); color: #fff }
+.night .kicker { color: var(--signal) }
+.res { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 56px; align-items: start }
+@media (max-width: 940px) { .res { grid-template-columns: 1fr; gap: 40px } }
+.laps { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 6px; margin-top: 28px }
+@media (max-width: 640px) { .laps { grid-template-columns: repeat(5, minmax(0, 1fr)) } }
+.lap { background: var(--night-2); border-radius: 8px; padding: 10px 6px 12px; text-align: center; display: grid; gap: 4px; position: relative }
+.lap .r { font: 700 11px/1 var(--f-body); letter-spacing: .12em; color: rgba(255,255,255,.5) }
+.lap .t { font: 800 22px/1 var(--f-display); font-variant-numeric: tabular-nums }
+.lap.best { background: var(--signal); color: var(--signal-ink) }
+.lap.best .r { color: rgba(36,28,0,.65) }
+.lap.drop .t { color: rgba(255,255,255,.4); text-decoration: line-through }
+.lap.dns .t { color: rgba(255,255,255,.3) }
+.sum { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 20px; margin-top: 22px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.12) }
+.sum b { font: 900 clamp(52px, 7vw, 76px)/.9 var(--f-display); color: var(--signal); font-variant-numeric: tabular-nums }
+.sum span { color: rgba(255,255,255,.7); font-size: 16px }
+.ex-note { margin-top: 10px; font-size: 14px; color: rgba(255,255,255,.5) }
+.legend-laps { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 14px; font-size: 14px; color: rgba(255,255,255,.7) }
+.legend-laps i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 6px }
+.rules { display: grid; gap: 22px }
+.rules ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px }
+.rules li { display: grid; grid-template-columns: 18px 1fr; gap: 10px; font-size: 17px; color: rgba(255,255,255,.85) }
+.rules li::before { content: ""; width: 12px; height: 12px; margin-top: 6px; background: var(--signal); transform: skewX(-14deg) }
+.rules .btn { justify-self: start }
+.arch { font-size: 15px; color: rgba(255,255,255,.6); line-height: 2 }
+.arch a { color: #fff; font-weight: 600; text-decoration-color: rgba(255,255,255,.35); text-underline-offset: 3px; margin-right: 12px; font-variant-numeric: tabular-nums }
+
+/* ---------- FAQ ---------- */
+.faq { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 48px }
+@media (max-width: 820px) { .faq { grid-template-columns: 1fr } }
+.faq details { border-top: 2px solid var(--fg) }
+.faq summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; gap: 16px; padding-block: 18px;
+  font: 800 25px/1.05 var(--f-display); text-transform: uppercase }
+.faq summary::-webkit-details-marker { display: none }
+.faq summary::after { content: "+"; font: 800 32px/.7 var(--f-display); color: var(--tartan-ink); transition: transform .2s }
+.faq details[open] summary::after { transform: rotate(45deg) }
+.faq details p { padding-bottom: 20px; color: var(--muted); max-width: 36em }
+
+/* ---------- PARTNERZY: białe tablice z logo ---------- */
+.pgroups { display: grid; gap: 30px }
+.pgroup { display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 14px 28px; align-items: center; padding-top: 30px; border-top: 2px solid var(--fg) }
+.pgroup:first-child { border-top: 0; padding-top: 0 }
+@media (max-width: 760px) { .pgroup { grid-template-columns: 1fr } }
+.pgroup h3 { font-size: 30px }
+.pgroup h3 small { display: block; font: 600 14px/1.3 var(--f-body); text-transform: none; letter-spacing: 0; color: var(--muted); margin-top: 6px }
+.boards { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 12px }
+/* tablica ma stałą wysokość, logo wypełnia ją i skaluje się proporcjonalnie */
+.pboard { position: relative; display: block; height: var(--h); padding: var(--p); border-radius: 12px; background: #fff; min-width: 0;
+  --h: 120px; --p: 18px 22px;
+  box-shadow: 0 0 0 1px var(--line), 0 12px 24px -18px rgba(18,24,38,.5); text-decoration: none; transition: transform .18s ease, box-shadow .18s ease }
+.pboard img { display: block; width: 100%; height: 100%; max-width: 100%; object-fit: contain }
+.pboard.dark { background: var(--night) }
+a.pboard:hover { transform: translateY(-3px); box-shadow: 0 0 0 2px var(--tartan-ink), 0 18px 30px -18px rgba(18,24,38,.6) }
+.org .pboard { --h: 170px; --p: 20px }
+.med .pboard { --h: 100px; --p: 16px 20px }
+@media (max-width: 900px) { .boards { --n: 2 !important } }
+@media (max-width: 480px) {
+  .boards { gap: 8px }
+  .pboard { --h: 92px; --p: 12px 14px; border-radius: 10px }
+  .org .pboard { --h: 124px; --p: 14px }
+  .med .pboard { --h: 70px; --p: 10px 8px }
+}
+
+
+/* ---------- KONTAKT ---------- */
+.contact { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: 56px; align-items: start }
+@media (max-width: 900px) { .contact { grid-template-columns: 1fr; gap: 34px } }
+.contact-info { display: grid; gap: 14px }
+.contact-info .lead { font-size: 19px; color: var(--muted) }
+.contact-info dl { margin: 10px 0 0; display: grid; gap: 18px }
+.contact-info dt { font: 700 12px/1 var(--f-body); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px }
+.contact-info dd { margin: 0; font-size: 17px }
+.contact-info dd a { color: var(--tartan-ink); font-weight: 700 }
+.contact .mail { display: flex; flex-wrap: wrap; align-items: center; gap: 10px }
+.contact .mail code { font: 700 18px/1.3 var(--f-body); color: var(--tartan-ink); user-select: all; word-break: break-all }
+.contact .mail button { font: 700 14px/1 var(--f-body); background: transparent; color: var(--fg); border: 1.5px solid var(--line); border-radius: 6px; padding: 8px 11px; cursor: pointer }
+.cform { background: var(--card); border-radius: 16px; padding: 26px; display: grid; gap: 16px; border-top: 6px solid var(--tartan);
+  box-shadow: 0 0 0 1px var(--line), 0 24px 40px -30px rgba(18,24,38,.45) }
+.cform .row2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px }
+@media (max-width: 560px) { .cform { padding: 20px 16px } .cform .row2 { grid-template-columns: 1fr } }
+.cform label { display: grid; gap: 7px; font-weight: 700; font-size: 15px; min-width: 0 }
+.cform label small { font-weight: 400; color: var(--muted) }
+.cform i { font-style: normal; color: var(--tartan-ink) }
+.cform input:not([type=checkbox]), .cform select, .cform textarea { width: 100%; font: 400 17px/1.4 var(--f-body); color: var(--fg); background: var(--field);
+  border: 1.5px solid var(--line); border-radius: 8px; padding: 11px 13px; min-width: 0 }
+.cform textarea { resize: vertical; min-height: 130px }
+.cform input:focus, .cform select:focus, .cform textarea:focus { outline: none; border-color: var(--tartan); box-shadow: 0 0 0 3px color-mix(in srgb, var(--tartan) 25%, transparent) }
+.cform [aria-invalid="true"] { border-color: var(--tartan-ink) !important; outline: 2px solid var(--tartan-ink) }
+.cform .consent { grid-template-columns: 22px minmax(0, 1fr); align-items: start; gap: 10px; font-weight: 400; font-size: 14px; color: var(--muted) }
+.cform .consent input { width: 20px; height: 20px; margin: 1px 0 0; accent-color: var(--tartan) }
+.cform .send { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px }
+.cform .req { font-size: 14px; color: var(--muted) }
+.fstatus { border-radius: 8px; padding: 12px 14px; font-size: 15px; background: var(--field); border-left: 4px solid var(--signal) }
+.fstatus.err { border-left-color: var(--tartan-ink) }
+
+/* ---------- STOPKA ---------- */
+footer { background: var(--night); color: #fff }
+.wordmark { font: 900 clamp(40px, 13vw, 190px)/.8 var(--f-display); text-transform: uppercase; color: transparent;
+  -webkit-text-stroke: 1.5px rgba(255,255,255,.28); padding-block: 56px 36px; letter-spacing: -.01em }
+.wordmark .o { -webkit-text-stroke-color: var(--wlb-orange) }
+.wordmark .g { -webkit-text-stroke-color: var(--wlb-green) }
+
+/* powrót na górę */
+.to-top { position: fixed; right: 18px; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 20; width: 56px; height: 56px;
+  border-radius: 50%; border: 0; cursor: pointer; display: grid; place-items: center; color: var(--signal-ink);
+  background: var(--signal); box-shadow: 0 0 0 4px var(--night), 0 14px 30px -10px rgba(0,0,0,.6);
+  transition: opacity .25s ease, transform .25s ease }
+.to-top svg { width: 24px; height: 24px; transition: transform .2s ease }
+.to-top:hover svg { transform: translateY(-3px) }
+.to-top.off { opacity: 0; transform: translateY(20px) scale(.8); pointer-events: none }
+.to-top span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0) }
+.foot { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr); gap: 30px; padding-bottom: 36px }
+@media (max-width: 800px) { .foot { grid-template-columns: 1fr } }
+.foot h3 { font-size: 22px; margin-bottom: 10px; color: var(--signal) }
+.foot p, .foot li { font-size: 16px; color: rgba(255,255,255,.8) }
+.foot ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px }
+.foot a { text-decoration: none; border-bottom: 1px solid rgba(255,255,255,.35) }
+.copy { font-size: 14px; color: rgba(255,255,255,.45); padding-block: 18px; border-top: 1px solid rgba(255,255,255,.1) }
+.finish { height: 14px; background: repeating-linear-gradient(90deg, transparent 0 58px, rgba(255,255,255,.75) 58px 60px), var(--tartan) }
+
+@media (prefers-reduced-motion: reduce) {
+  .plane, .hero h1 .w, .tl-run::after { animation: none }
+  .to-top, .to-top svg { transition: none }
+}
+</style>
+
+<div class="mock-note"><div class="wrap">Makieta nowej strony warszawskaligabiegowa.pl · dane rund z regulaminu 2026</div></div>
+
+<header class="hero" id="top">
+  <div class="plane" aria-hidden="true"></div>
+  <div class="wrap top">
+    <a class="brand" href="#top"><img src="logo-wlb.png" alt="Logo Warszawskiej Ligi Biegowej"><span>Warszawska Liga Biegowa</span></a>
+    <nav aria-label="Główne">
+      <a href="#sezon">Terminarz</a>
+      <a href="#dystanse">Dystanse</a>
+      <a href="#dzien">Dzień zawodów</a>
+      <a href="#wyniki">Klasyfikacja</a>
+      <a href="#faq">FAQ</a>
+      <a href="#partnerzy">Partnerzy</a>
+      <a href="#kontakt">Kontakt</a>
+    </nav>
+    <a class="btn" id="cta-top" href="https://meets.rosterathletics.com/public/competitions/details/about?id=29891">Zapisz dziecko</a>
+  </div>
+  <div class="wrap hero-in">
+    <div>
+      <h1><span class="w w1">Na miejsca.</span><span class="w w2">Gotowi.</span><span class="w w3">Start!</span></h1>
+      <p class="sub">Liga biegowa dla dzieci <b>7–14 lat</b>. Dziesięć rund w roku na bieżni AWF Warszawa, dystanse <b>60, 300 i 600 m</b>, pomiar foto-finish, medale i klasyfikacja generalna.</p>
+      <div class="acts">
+        <a class="btn line" href="#dystanse">Sprawdź dystans dla dziecka <span class="arr">→</span></a>
+      </div>
+    </div>
+    <div class="shot-wrap">
+      <figure class="shot">
+        <img src="foto-stadion.jpg" alt="Trzy dziewczynki z numerami startowymi biegną po czerwonej bieżni stadionu AWF">
+        <figcaption>Stadion AWF · 60 m</figcaption>
+      </figure>
+      <div class="speed" aria-hidden="true"><i></i><i></i><i></i></div>
+    </div>
+  </div>
+  <div class="wrap">
+    <aside class="board" aria-labelledby="b-round">
+      <div class="board-col">
+        <div class="board-top"><b id="b-round">Runda 8</b><span class="chip Stadion" id="b-venue">Stadion</span></div>
+        <p class="when" id="b-when">niedziela, 4 października · AWF, Marymoncka 34</p>
+      </div>
+      <div class="board-col">
+        <p class="lbl" id="b-lbl">Do końca zapisów</p>
+        <div class="digits num" id="digits" aria-live="off">
+          <div class="dgroup"><div class="dpair"><span class="dg">0</span><span class="dg">1</span></div><span>dni</span></div>
+          <div class="dgroup"><div class="dpair"><span class="dg">0</span><span class="dg">8</span></div><span>godz</span></div>
+          <div class="dgroup"><div class="dpair"><span class="dg">2</span><span class="dg">9</span></div><span>min</span></div>
+          <div class="dgroup"><div class="dpair"><span class="dg">0</span><span class="dg">0</span></div><span>sek</span></div>
+        </div>
+      </div>
+      <div class="board-col">
+        <a class="btn" id="cta-board" href="https://meets.rosterathletics.com/public/competitions/details/about?id=29891"><span id="cta-board-txt">Zapisz na rundę 8</span> <span class="arr">→</span></a>
+        <p class="facts"><span>Biuro zawodów <b>13:00–17:00</b></span><span><b>35 zł</b> za dystans · limit <b>500</b> startów</span></p>
+      </div>
+    </aside>
+  </div>
+</header>
+
+
+<main>
+  <section class="sec" id="sezon">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="kicker">Sezon 2026</p>
+          <h2>Dziesięć rund, jeden sezon</h2>
+          <p class="lead">Wiosną i jesienią startujemy na stadionie, zimą w hali. Wszystkie rundy w niedziele, na AWF przy Marymonckiej 34.</p>
+        </div>
+      </div>
+      <div class="tl" id="tl" aria-hidden="true"></div>
+      <ol class="tl-list" id="tl-list"></ol>
+      <div class="tl-legend">
+        <span><i style="background:var(--stadion)"></i>Stadion</span>
+        <span><i style="background:var(--hala)"></i>Hala</span>
+        <span><i class="run"></i>tyle sezonu już za nami</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec grass" id="dystanse">
+    <div class="wrap dist">
+      <div class="pick">
+        <div style="display:grid;gap:12px">
+          <p class="kicker">Dla rodziców</p>
+          <h2>Jak daleko pobiegnie Twoje dziecko?</h2>
+        </div>
+        <div class="pick-row">
+          <span id="lbl-year">Rocznik</span>
+          <div class="chips" id="years" role="group" aria-labelledby="lbl-year"></div>
+        </div>
+        <div class="age" aria-live="polite">
+          <b id="age-n">10</b>
+          <p><strong id="age-t">lat w sezonie 2026</strong><span id="age-d">Może biec na 60 m i 300 m.</span></p>
+        </div>
+        <div class="pick-row">
+          <span id="lbl-dist">Pokaż trasę</span>
+          <div class="chips big" id="dists" role="group" aria-labelledby="lbl-dist"></div>
+        </div>
+      </div>
+      <figure class="oval">
+        <svg id="oval" viewBox="-92 -54 184 108" role="img" aria-label="Schemat stadionu z zaznaczoną trasą biegu"></svg>
+        <figcaption><i></i><span id="route-txt">300 m: start na wirażu, meta na końcu prostej</span></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="sec" id="dzien">
+    <div class="wrap">
+      <div class="sec-head"><div><p class="kicker">Krok po kroku</p><h2>Dzień zawodów</h2></div></div>
+      <div class="day">
+      <figure class="day-shot">
+        <img src="foto-hala.jpg" alt="Dwóch chłopców i dziewczynka sprintują po niebieskiej bieżni w hali AWF">
+        <figcaption>Hala AWF · 60 m</figcaption>
+      </figure>
+      <ol class="steps">
+        <li><span class="n" aria-hidden="true">1</span><h3>Zapis online</h3><p>Zgłoszenie w <b>Roster Athletics</b> do piątku przed rundą, do 23:59. <b>35 zł</b> za jeden dystans, liczy się kolejność wpłat.</p></li>
+        <li><span class="n" aria-hidden="true">2</span><h3>Biuro zawodów</h3><p>W niedzielę <b>13:00–17:00</b>. Odbierasz pakiet z numerem startowym i agrafkami.</p></li>
+        <li><span class="n" aria-hidden="true">3</span><h3>Bieg</h3><p>Dziecko biegnie samo, w serii do <b>10 osób</b> ułożonej według wcześniejszych czasów. Kolce najwyżej 9 mm.</p></li>
+        <li><span class="n" aria-hidden="true">4</span><h3>Medale</h3><p>Czas mierzy <b>LYNX foto-finish</b>. Trzy najszybsze dziewczynki i trzech najszybszych chłopców w każdej kategorii stają na podium.</p></li>
+      </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec night" id="wyniki">
+    <div class="wrap res">
+      <div>
+        <p class="kicker">Klasyfikacja generalna</p>
+        <h2 style="margin-top:12px">Liczy się 7 najlepszych biegów</h2>
+        <div class="laps" id="laps"></div>
+        <div class="legend-laps">
+          <span><i style="background:var(--signal)"></i>wlicza się do sumy</span>
+          <span><i style="background:var(--night-2);box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)"></i>odrzucony</span>
+        </div>
+        <div class="sum"><b id="sum">5:52,90</b><span id="sum-t">suma 7 najlepszych czasów</span></div>
+        <p class="ex-note">Przykładowy sezon na 300 m, czasy w sekundach.</p>
+      </div>
+      <div class="rules">
+        <ul>
+          <li>Osobne tabele dla każdego dystansu, rocznika i płci.</li>
+          <li>W klasyfikacji są dzieci z co najmniej 7 startami.</li>
+          <li>Przy równej sumie wygrywa najlepszy czas w sezonie.</li>
+          <li>Rekordy WLB prowadzimy osobno dla hali i stadionu.</li>
+          <li>Tabela aktualizuje się sama po każdej rundzie.</li>
+        </ul>
+        <a class="btn" href="https://przemowakcji.github.io/wlb-klasyfikacja/">Klasyfikacja 2026 <span class="arr">→</span></a>
+        <p class="arch">Archiwum:
+          <a href="https://www.warszawskaligabiegowa.pl/klasyfikacja-generalna-2025">2025</a><a href="https://www.warszawskaligabiegowa.pl/klasyfikacja-generalna-2024">2024</a><a href="https://www.warszawskaligabiegowa.pl/klasyfikacja-generalna-2023">2023</a><a href="https://www.warszawskaligabiegowa.pl/klasyfikacja-generalna-2022">2022</a><a href="https://www.warszawskaligabiegowa.pl/klasyfikacja-generalna-2021">2021</a><a href="https://www.warszawskaligabiegowa.pl/klasyfikacja-generalna-2020">2019/20</a><a href="https://www.warszawskaligabiegowa.pl/klasyfikacja-generalna">2018/19</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="faq">
+    <div class="wrap">
+      <div class="sec-head"><div><p class="kicker">FAQ</p><h2>Pytania rodziców</h2></div>
+        <a href="https://www.warszawskaligabiegowa.pl/regulamin" style="font-weight:700;color:var(--tartan-ink)">Pełny regulamin →</a></div>
+      <div class="faq">
+        <div>
+          <details name="faq"><summary>Ile kosztuje start?</summary><p>35 zł za jeden dystans w jednej rundzie. W tej samej rundzie dziecko może pobiec na kilku dystansach, opłata jest za każdy z nich.</p></details>
+          <details name="faq"><summary>Można zapisać się w dniu zawodów?</summary><p>Nie. Zapisy są tylko online, do piątku przed rundą do 23:59 albo do wyczerpania miejsc.</p></details>
+          <details name="faq"><summary>Ile dzieci startuje w rundzie?</summary><p>Do 500 startów na rundę, wstępnie 250 na 60 m i 200 na 300 m. Jedno dziecko na trzech dystansach to trzy starty.</p></details>
+        </div>
+        <div>
+          <details name="faq"><summary>Kto dostaje medal?</summary><p>Miejsca 1–3 w każdej rundzie, osobno w każdym roczniku i na każdym dystansie, oddzielnie dla dziewczynek i chłopców.</p></details>
+          <details name="faq"><summary>Czy rodzic biegnie z dzieckiem?</summary><p>Nie. Dzieci startują samodzielnie. Rodzic odbiera pakiet w biurze zawodów i kibicuje z trybun.</p></details>
+          <details name="faq"><summary>Czy dostanę fakturę?</summary><p>Tak. Zaznacz tę opcję w formularzu zgłoszenia albo napisz do nas przed płatnością. Opłata nie podlega zwrotowi.</p></details>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="partnerzy">
+    <div class="wrap">
+      <div class="sec-head"><div><p class="kicker">Razem robimy ligę</p><h2>Organizatorzy i partnerzy</h2></div></div>
+      <div class="pgroups">
+        <div class="pgroup org">
+          <h3>Organizatorzy</h3>
+          <div class="boards" style="--n:2">
+            <a class="pboard dark" href="https://azsawf.com/"><img src="partnerzy/azs-awf.png" alt="KS AZS AWF Warszawa"></a>
+            <a class="pboard" href="https://wmozla.pl/"><img src="partnerzy/wmozla.svg" alt="Warszawsko-Mazowiecki Okręgowy Związek Lekkiej Atletyki"></a>
+          </div>
+        </div>
+        <div class="pgroup">
+          <h3>Partnerzy</h3>
+          <div class="boards" style="--n:4">
+            <a class="pboard" href="https://www.awf.edu.pl/"><img src="partnerzy/awf.png" alt="Akademia Wychowania Fizycznego Józefa Piłsudskiego w Warszawie"></a>
+            <a class="pboard" href="https://fundacja.pzu.pl/"><img src="partnerzy/pzu.svg" alt="Fundacja PZU"></a>
+            <a class="pboard" href="https://www.fundacjalotto.pl/"><img src="partnerzy/lotto.png" alt="Fundacja Lotto im. Haliny Konopackiej"></a>
+            <a class="pboard dark" href="https://www.rosterathletics.com/"><img src="partnerzy/roster.png" alt="Roster Athletics"></a>
+          </div>
+        </div>
+        <div class="pgroup med">
+          <h3>Patroni medialni</h3>
+          <div class="boards" style="--n:2">
+            <a class="pboard" href="https://czasdzieci.pl/"><img src="partnerzy/czasdzieci.svg" alt="CzasDzieci.pl"></a>
+            <a class="pboard" href="https://egaga.pl/"><img src="partnerzy/egaga.png" alt="egaga.pl"></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="kontakt">
+    <div class="wrap contact">
+      <div class="contact-info">
+        <p class="kicker">Kontakt</p>
+        <h2>Napisz do nas</h2>
+        <p class="lead">Pytania o zapisy, wyniki, faktury albo współpracę. Odpowiemy na adres e-mail podany w formularzu.</p>
+        <dl>
+          <div><dt>E-mail</dt><dd><span class="mail"><code id="mail">kontakt@warszawskaligabiegowa.pl</code><button type="button" id="copy">Kopiuj</button></span></dd></div>
+          <div><dt>Dojazd</dt><dd><a href="https://www.google.com/maps/search/?api=1&amp;query=AWF+Warszawa+Marymoncka+34">AWF Warszawa w Mapach Google →</a></dd></div>
+        </dl>
+      </div>
+      <form class="cform" id="cform" novalidate>
+        <div class="row2">
+          <label for="f-name"><span>Imię i nazwisko <i>*</i></span><input id="f-name" name="name" autocomplete="name" required></label>
+          <label for="f-email"><span>E-mail <i>*</i></span><input id="f-email" name="email" type="email" autocomplete="email" required></label>
+        </div>
+        <div class="row2">
+          <label for="f-phone"><span>Telefon <small>(opcjonalnie)</small></span><input id="f-phone" name="phone" type="tel" autocomplete="tel"></label>
+          <label for="f-topic"><span>Temat</span>
+            <select id="f-topic" name="topic">
+              <option>Zapisy i płatności</option>
+              <option>Wyniki i klasyfikacja</option>
+              <option>Faktura</option>
+              <option>Współpraca i sponsoring</option>
+              <option>Media</option>
+              <option>Inne</option>
+            </select>
+          </label>
+        </div>
+        <label for="f-msg"><span>Wiadomość <i>*</i></span><textarea id="f-msg" name="message" rows="6" required></textarea></label>
+        <label class="consent" for="f-ok"><input id="f-ok" name="consent" type="checkbox" required>
+          <span>Zgadzam się na przetwarzanie moich danych w celu odpowiedzi na wiadomość. <i>*</i></span></label>
+        <div class="send">
+          <button class="btn" type="submit">Wyślij wiadomość <span class="arr">→</span></button>
+          <p class="req"><i>*</i> pola wymagane</p>
+        </div>
+        <p class="fstatus" id="fstatus" role="status" hidden></p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p class="wordmark" aria-hidden="true"><span class="o">Warszawska</span><br><span class="g">Liga</span> Biegowa</p>
+    <div class="foot">
+      <div>
+        <h3>Kontakt</h3>
+        <p>kontakt@warszawskaligabiegowa.pl<br><a href="#kontakt">Formularz kontaktowy</a></p>
+      </div>
+      <div>
+        <h3>Gdzie biegamy</h3>
+        <p>AWF Warszawa, stadion i hala lekkoatletyczna<br>ul. Marymoncka 34, 01-813 Warszawa</p>
+      </div>
+      <div>
+        <h3>Na skróty</h3>
+        <ul>
+          <li><a href="#sezon">Terminarz 2026</a></li>
+          <li><a href="https://przemowakcji.github.io/wlb-klasyfikacja/">Klasyfikacja generalna</a></li>
+          <li><a href="https://www.warszawskaligabiegowa.pl/regulamin">Regulamin</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="copy num">© 2018–2026 Warszawska Liga Biegowa</p>
+  </div>
+  <div class="finish" aria-hidden="true"></div>
+</footer>
+
+<button type="button" class="to-top off" id="to-top" title="Wróć na górę">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+  <span>Wróć na górę</span>
+</button>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  // terminarz z data/plan.json
+  const PLAN = [["2026-03-08","Stadion"],["2026-03-22","Hala"],["2026-04-12","Hala"],["2026-04-26","Stadion"],["2026-05-10","Stadion"],
+                ["2026-05-31","Stadion"],["2026-09-20","Stadion"],["2026-10-04","Stadion"],["2026-11-08","Hala"],["2026-12-13","Hala"]];
+  const SIGNUP = { 8: "https://meets.rosterathletics.com/public/competitions/details/about?id=29891" };
+  const SIGNUP_FALLBACK = "https://www.warszawskaligabiegowa.pl/zapisz-sie";
+  const RESULTS = "https://przemowakcji.github.io/wlb-klasyfikacja/";
+  const MG = ["stycznia","lutego","marca","kwietnia","maja","czerwca","lipca","sierpnia","września","października","listopada","grudnia"];
+  const MS = ["sty","lut","mar","kwi","maj","cze","lip","sie","wrz","paź","lis","gru"];
+  const WD = ["niedziela","poniedziałek","wtorek","środa","czwartek","piątek","sobota"];
+  const parse = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+  const DAY = 864e5;
+  const now = new Date(), today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const rounds = PLAN.map(([d, v], i) => ({ n: i + 1, date: parse(d), venue: v }));
+  const next = rounds.find(r => r.date >= today);
+  const dot = v => v === "Hala" ? "var(--hala)" : "var(--stadion)";
+  const ddmm = d => `${d.getDate()}.${String(d.getMonth() + 1).padStart(2, "0")}`;
+
+  // ---- tablica: odliczanie do końca zapisów (piątek 23:59), potem do otwarcia biura (13:00)
+  if (next) {
+    const link = SIGNUP[next.n] || SIGNUP_FALLBACK;
+    ["cta-top", "cta-board"].forEach(id => $(id).href = link);
+    $("b-round").textContent = `Runda ${next.n}`;
+    $("b-venue").textContent = next.venue; $("b-venue").className = "chip " + next.venue;
+    $("b-when").textContent = `${WD[next.date.getDay()]}, ${next.date.getDate()} ${MG[next.date.getMonth()]} · AWF, Marymoncka 34`;
+    $("cta-board-txt").textContent = `Zapisz na rundę ${next.n}`;
+    const deadline = new Date(next.date.getTime() - 2 * DAY + (23 * 3600 + 59 * 60 + 59) * 1000);
+    const office = new Date(next.date.getTime() + 13 * 3600 * 1000);
+    const cells = [...document.querySelectorAll("#digits .dg")];
+    const tick = () => {
+      const t = Date.now(), closed = t > deadline;
+      $("b-lbl").textContent = closed ? "Zapisy zamknięte · do otwarcia biura" : "Do końca zapisów";
+      let s = Math.max(0, Math.floor(((closed ? office : deadline) - t) / 1000));
+      const parts = [Math.min(99, Math.floor(s / 86400)), Math.floor(s % 86400 / 3600), Math.floor(s % 3600 / 60), s % 60];
+      parts.map(v => String(v).padStart(2, "0")).join("").split("").forEach((c, i) => { if (cells[i].textContent !== c) cells[i].textContent = c; });
+    };
+    tick(); setInterval(tick, 1000);
+  } else {
+    $("b-round").textContent = "Sezon 2026"; $("b-lbl").textContent = "Zakończony · do zobaczenia wiosną";
+  }
+
+  // ---- oś sezonu na bieżni
+  const S = new Date(2026, 1, 22), E = new Date(2026, 11, 31);
+  const pct = d => Math.max(0, Math.min(100, (d - S) / (E - S) * 100));
+  let h = `<div class="tl-track">`;
+  for (let m = 2; m <= 11; m++) h += `<span class="tl-month" style="left:${pct(new Date(2026, m, 1))}%">${MS[m].toUpperCase()}</span>`;
+  const b0 = pct(new Date(2026, 5, 8)), b1 = pct(new Date(2026, 8, 12));
+  h += `<span class="tl-break" style="left:${b0}%;width:${b1 - b0}%">przerwa wakacyjna</span>`;
+  h += `<span class="tl-run" style="width:${pct(today)}%"></span></div>`;
+  rounds.forEach(r => {
+    const past = r.date < today, isNext = next && next.n === r.n, x = pct(r.date);
+    h += `<span class="tl-mark${past ? " past" : ""}" style="left:${x}%"></span>
+      <div class="tl-lab ${r.n % 2 ? "up" : "down"}${past ? " past" : ""}${isNext ? " next" : ""}" style="left:${x}%;--dot:${dot(r.venue)}">
+        <span class="r">Runda ${r.n}</span><span class="d num">${ddmm(r.date)}</span>
+        <span class="v">${r.venue}</span>${past ? `<a href="${RESULTS}">wyniki</a>` : ""}</div>`;
+  });
+  $("tl").innerHTML = h;
+  $("tl-list").innerHTML = rounds.map(r => {
+    const past = r.date < today, isNext = next && next.n === r.n;
+    const st = past ? `<a href="${RESULTS}">Wyniki</a>` : isNext ? "Zapisy otwarte" : "Wkrótce";
+    return `<li class="${past ? "past" : ""}${isNext ? " next" : ""}"><span class="ln"></span><span class="d num">${ddmm(r.date)}</span>
+      <span class="info"><b>Runda ${r.n} · ${r.venue}</b><span>${st}</span></span></li>`;
+  }).join("");
+
+  // ---- dystanse wg rocznika (regulamin, pkt VIII)
+  const SEASON = 2026;
+  const allowed = y => y === 2019 ? [60] : y >= 2015 ? [60, 300] : [60, 300, 600];
+  const ROUTE = { 60: "60 m: cały bieg na prostej, bez wirażu", 300: "300 m: start na wirażu, meta na końcu prostej", 600: "600 m: półtora okrążenia stadionu" };
+  let year = 2016, dist = 300;
+  for (let y = 2012; y <= 2019; y++) $("years").insertAdjacentHTML("beforeend", `<button type="button" id="y${y}" data-y="${y}">${y}</button>`);
+  [60, 300, 600].forEach(d => $("dists").insertAdjacentHTML("beforeend", `<button type="button" id="d${d}" data-d="${d}">${d} m</button>`));
+  $("years").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return;
+    year = +b.dataset.y; if (!allowed(year).includes(dist)) dist = Math.max(...allowed(year)); update(); });
+  $("dists").addEventListener("click", e => { const b = e.target.closest("button"); if (!b || b.disabled) return; dist = +b.dataset.d; update(); });
+
+  // stadion 400 m: prosta 84,39 m, łuk wewnętrzny r = 36,5 m
+  const svg = $("oval"), NS = "http://www.w3.org/2000/svg";
+  const H = 84.39 / 2, R0 = 36.5, LW = 1.22, LANES = 8, RO = R0 + LANES * LW;
+  const stadium = r => `M ${H} ${r} A ${r} ${r} 0 0 0 ${H} ${-r} L ${-H} ${-r} A ${r} ${r} 0 0 0 ${-H} ${r} Z`;
+  const el = (t, a) => { const n = document.createElementNS(NS, t); for (const k in a) n.setAttribute(k, a[k]); svg.appendChild(n); return n; };
+  el("path", { d: stadium(R0 + LANES * LW / 2), fill: "none", stroke: "var(--tartan)", "stroke-width": LANES * LW });
+  el("path", { d: stadium(R0), fill: "var(--infield)" });
+  for (let x = -H - 30; x < H + 30; x += 12) el("rect", { x, y: -R0, width: 6, height: 2 * R0, fill: "rgba(255,255,255,.05)", "clip-path": "url(#inf)" });
+  const cp = document.createElementNS(NS, "clipPath"); cp.id = "inf"; const cpp = document.createElementNS(NS, "path"); cpp.setAttribute("d", stadium(R0)); cp.appendChild(cpp); svg.prepend(cp);
+  for (let i = 0; i <= LANES; i++) el("path", { d: stadium(R0 + i * LW), fill: "none", stroke: "rgba(255,255,255,.8)", "stroke-width": i % LANES ? .16 : .35 });
+  el("line", { x1: H, y1: R0, x2: H, y2: RO, stroke: "#fff", "stroke-width": 1.4 });
+  el("text", { x: H, y: RO + 8.5, "text-anchor": "middle", class: "svg-label" }).textContent = "META";
+  el("text", { x: 0, y: -2, "text-anchor": "middle", class: "svg-sub" }).textContent = "STADION AWF · 400 M";
+  el("text", { x: 0, y: 5, "text-anchor": "middle", class: "svg-sub" }).textContent = "W HALI OKRĄŻENIE MA 200 M";
+  const RR = R0 + LW / 2;
+  const route = el("path", { d: stadium(RR), fill: "none", stroke: "var(--signal)", "stroke-width": 1.7, "stroke-linecap": "round", pathLength: 400 });
+  const startDot = el("circle", { r: 2.3, fill: "var(--signal)", stroke: "#241c00", "stroke-width": .5 });
+  const startTxt = el("text", { "text-anchor": "middle", class: "svg-label" }); startTxt.textContent = "START";
+  const runner = el("circle", { r: 1.8, fill: "#fff", stroke: "#241c00", "stroke-width": .55 });
+  const total = route.getTotalLength();
+  const pointAt = s => route.getPointAtLength(((s % 400 + 400) % 400) / 400 * total);
+  const outward = p => { if (Math.abs(p.x) <= H) return { x: 0, y: Math.sign(p.y) || 1 };
+    const dx = p.x - Math.sign(p.x) * H, l = Math.hypot(dx, p.y); return { x: dx / l, y: p.y / l }; };
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let raf;
+  function drawRoute() {
+    const d = dist, s = (400 - d % 400) % 400;
+    if (d >= 400) { route.removeAttribute("stroke-dasharray"); route.removeAttribute("stroke-dashoffset"); }
+    else { route.setAttribute("stroke-dasharray", `${d} 400`); route.setAttribute("stroke-dashoffset", 2 * d); }
+    const p = pointAt(s), o = outward(p), off = LANES * LW + 7;
+    startDot.setAttribute("cx", p.x); startDot.setAttribute("cy", p.y);
+    startTxt.setAttribute("x", p.x + o.x * off); startTxt.setAttribute("y", p.y + o.y * off + 2.5);
+    cancelAnimationFrame(raf);
+    const place = q => { runner.setAttribute("cx", q.x); runner.setAttribute("cy", q.y); };
+    if (reduce) return place(pointAt(0));
+    const dur = 900 + d * 2.2, t0 = performance.now(), from = 400 - d;
+    const step = t => { const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 2.2); place(pointAt(from + e * d)); if (k < 1) raf = requestAnimationFrame(step); };
+    raf = requestAnimationFrame(step);
+  }
+  function update() {
+    const ok = allowed(year);
+    $("years").querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", +b.dataset.y === year));
+    $("dists").querySelectorAll("button").forEach(b => { const d = +b.dataset.d; b.disabled = !ok.includes(d); b.setAttribute("aria-pressed", d === dist); });
+    const list = ok.map(d => d + " m"), txt = list.length > 1 ? list.slice(0, -1).join(", ") + " i " + list.at(-1) : list[0];
+    $("age-n").textContent = SEASON - year;
+    $("age-t").textContent = `lat w sezonie ${SEASON}`;
+    $("age-d").textContent = `Rocznik ${year} może biec na ${txt}.`;
+    $("route-txt").textContent = ROUTE[dist];
+    drawRoute();
+  }
+  update();
+
+  // ---- przykład: 7 najlepszych z 9 startów
+  const EX = [52.84, 51.90, null, 51.12, 50.47, 50.95, 49.88, 49.61, 50.20, 51.40];
+  const best = EX.map((t, i) => [t, i]).filter(([t]) => t != null).sort((a, b) => a[0] - b[0]).slice(0, 7).map(([, i]) => i);
+  const fmt = s => { const m = Math.floor(s / 60), r = (s - m * 60).toFixed(2).replace(".", ","); return m ? `${m}:${r.padStart(5, "0")}` : r; };
+  $("laps").innerHTML = EX.map((t, i) => `<div class="lap ${t == null ? "dns" : best.includes(i) ? "best" : "drop"}">
+    <span class="r">R${i + 1}</span><span class="t">${t == null ? "–" : fmt(t)}</span></div>`).join("");
+  $("sum").textContent = fmt(best.reduce((a, i) => a + EX[i], 0));
+  $("sum-t").textContent = `suma 7 najlepszych · najlepszy czas sezonu ${fmt(Math.min(...EX.filter(t => t != null)))}`;
+
+  // ---- powrót na górę: pokazuje się po przewinięciu poza tablicę z odliczaniem
+  const top = $("to-top");
+  const onScroll = () => top.classList.toggle("off", scrollY < 700);
+  addEventListener("scroll", onScroll, { passive: true }); onScroll();
+  top.addEventListener("click", () => { scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" }); $("top").querySelector(".brand").focus({ preventScroll: true }); });
+
+  // ---- formularz kontaktowy (w makiecie tylko walidacja, bez wysyłki)
+  const form = $("cform"), st = $("fstatus");
+  const NAMES = { "f-name": "imię i nazwisko", "f-email": "poprawny e-mail", "f-msg": "wiadomość", "f-ok": "zgoda na przetwarzanie danych" };
+  form.addEventListener("submit", e => {
+    e.preventDefault();
+    const req = [...form.querySelectorAll("[required]")], bad = req.filter(f => !f.checkValidity());
+    req.forEach(f => f.setAttribute("aria-invalid", bad.includes(f)));
+    st.hidden = false;
+    if (bad.length) {
+      st.className = "fstatus err";
+      st.textContent = "Uzupełnij: " + bad.map(f => NAMES[f.id]).join(", ") + ".";
+      bad[0].focus();
+    } else {
+      st.className = "fstatus";
+      st.textContent = "To makieta, więc wiadomość nie została wysłana. Na prawdziwej stronie trafi na kontakt@warszawskaligabiegowa.pl.";
+    }
+  });
+  form.addEventListener("input", e => { if (e.target.getAttribute("aria-invalid") === "true" && e.target.checkValidity()) e.target.setAttribute("aria-invalid", "false"); });
+  form.addEventListener("change", e => { if (e.target.type === "checkbox" && e.target.checked) e.target.setAttribute("aria-invalid", "false"); });
+
+  // ---- kopiowanie adresu
+  $("copy").addEventListener("click", e => {
+    const b = e.currentTarget, sel = () => { const r = document.createRange(); r.selectNodeContents($("mail")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); };
+    try { navigator.clipboard.writeText($("mail").textContent).then(() => { b.textContent = "Skopiowano"; }, sel); } catch { sel(); }
+  });
+})();
+</script>
+
+</html>
